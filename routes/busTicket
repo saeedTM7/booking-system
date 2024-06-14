@@ -1,0 +1,44 @@
+const express = require('express');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+const router = express.Router();
+router.use(express.json());
+
+
+// POST method to create a new busticket 
+router.post('/', async (req, res) => {
+    const { origin, destination, departureDateTime, value } = req.body;
+
+    console.log(req.body)
+    try {
+        const newBusticket = await prisma.busticket.create({
+            data: { origin, destination, departureDateTime, value },
+        });
+        res.status(201).json(newBusticket);
+    }
+    catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// GET method to retrieve all bustickets 
+
+router.get('/bustickets', async (req, res) => {
+    try {
+        const bustickets = await prisma.busticket.findMany();
+        res.json(bustickets);
+    }
+    catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+// DELETE method to delete a busticket by ID
+
+router.delete('/bustickets/:id', async (req, res) => {
+    const { id } = req.params; try {
+        const deletedBusticket = await prisma.busticket.delete({ where: { id: parseInt(id) }, });
+        res.json(deletedBusticket);
+    }
+    catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+
+
+module.exports = router;

@@ -1,0 +1,40 @@
+// Prisma schema definition (schema.prisma)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int    @id @default(autoincrement())
+  name         String
+  email        String 
+  phone_number Int?   @unique
+  id_cart      Int?   @unique
+
+  // Assuming a user can have multiple trips
+  trips Trip[]
+}
+
+model Trip {
+  id          Int        @id @default(autoincrement())
+  busTicketId Int?
+  busTicket   BusTicket? @relation(fields: [busTicketId], references: [id])
+  
+  // Assuming a trip can have multiple users
+  users User[]
+}
+
+model BusTicket {
+  id                Int      @id @default(autoincrement())
+  origin            String
+  destination       String
+  departureDateTime DateTime
+  value             Float
+
+  Trip Trip[]
+}
